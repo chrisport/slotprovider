@@ -7,7 +7,12 @@ import (
 	"sync"
 )
 
-type SlotProvider struct {
+type SlotProvider interface{
+	Start()
+	RequestSlot() (bool, func())
+}
+
+type slotProvider struct {
 	openSlots  int
 	slotChan   chan bool
 	notifyChan chan bool
@@ -21,10 +26,10 @@ func NewSlotProvider(nrOfSlots int, ctx context.Context) SlotProvider {
 	for ; openSlots > 0; openSlots-- {
 		slotChan <- true
 	}
-	return SlotProvider{openSlots: nrOfSlots, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
+	return &slotProvider{openSlots: nrOfSlots, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
 }
 
-func (sp *SlotProvider) Start() {
+func (sp *slotProvider) Start() {
 	for {
 		for ; sp.openSlots > 0; sp.openSlots-- {
 			sp.slotChan <- true
@@ -41,7 +46,7 @@ func (sp *SlotProvider) Start() {
 	}
 }
 
-func (sp *SlotProvider) RequestSlot() (bool, func()) {
+func (sp *slotProvider) RequestSlot() (bool, func()) {
 	select {
 	case <-sp.slotChan:
 		once := sync.Once{}
