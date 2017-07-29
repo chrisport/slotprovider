@@ -1,15 +1,15 @@
 package slotprovider
 
 import (
-	"time"
 	"golang.org/x/net/context"
 	"log"
 	"sync"
 )
 
 type SlotProvider interface {
-	Start()
-	AcquireSlot() (bool, func())
+	AcquireSlot() bool
+	Release()
+	OpenSlots() int
 }
 
 type slotProvider struct {
@@ -19,7 +19,11 @@ type slotProvider struct {
 	ctx        context.Context
 }
 
-func NewSlotProvider(nrOfSlots int, ctx context.Context) SlotProvider {
+func NewWithMutex(nrOfSlots int) SlotProvider {
+	return &slotProviderMut{mut: sync.Mutex{}, openSlots: nrOfSlots}
+}
+
+func NewWithChannel(nrOfSlots int, ctx context.Context) SlotProvider {
 	var slotChan = make(chan bool, nrOfSlots)
 	var notifyChan = make(chan bool)
 	openSlots := nrOfSlots
@@ -27,35 +31,62 @@ func NewSlotProvider(nrOfSlots int, ctx context.Context) SlotProvider {
 		slotChan <- true
 	}
 	sp := &slotProvider{openSlots: nrOfSlots, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
-	go sp.Start()
+	go sp.start()
 	return sp
 }
 
-func (sp *slotProvider) Start() {
+func (sp *slotProvider) OpenSlots() int {
+	return sp.openSlots
+}
+
+func (sp *slotProvider) start() {
 	for {
-		for ; sp.openSlots > 0; sp.openSlots-- {
-			sp.slotChan <- true
-		}
 		select {
+		case sp.slotChan <- true:
 		case <-sp.ctx.Done():
 			log.Println("SlotProvider shutdown")
 			return
 		case <-sp.notifyChan:
 			sp.openSlots++
-		default:
-			time.Sleep(1 * time.Second)
 		}
 	}
 }
 
-func (sp *slotProvider) AcquireSlot() (bool, func()) {
+func (sp *slotProvider) Release() {
+	sp.notifyChan <- true
+}
+
+func (sp *slotProvider) AcquireSlot() bool {
 	select {
 	case <-sp.slotChan:
-		once := sync.Once{}
-		return true, func() {
-			once.Do(func() { sp.notifyChan <- true })
-		}
+		return true
 	default:
-		return false, nil
+		return false
 	}
+}
+
+type slotProviderMut struct {
+	openSlots int
+	mut       sync.Mutex
+}
+
+func (sp *slotProviderMut) OpenSlots() int {
+	return sp.openSlots
+}
+
+func (sp *slotProviderMut) Release() {
+	sp.mut.Lock()
+	sp.openSlots++
+	sp.mut.Unlock()
+}
+
+func (sp *slotProviderMut) AcquireSlot() bool {
+	res := false
+	sp.mut.Lock()
+	if sp.openSlots > 0 {
+		sp.openSlots--
+		res = true
+	}
+	sp.mut.Unlock()
+	return res
 }
