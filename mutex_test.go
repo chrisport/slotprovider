@@ -11,7 +11,7 @@ func TestMut_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
 
 	results := make([]bool, 11)
 	for i := 0; i < 10; i++ {
-		results[i] = sp.AcquireSlot()
+		results[i], _ = sp.AcquireSlot()
 	}
 
 	for i := 0; i < 10; i++ {
@@ -22,13 +22,14 @@ func TestMut_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
 func TestMut_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
 	sp = slotprovider.NewWithMutex(nrOfSlots)
 	var res bool
+	var release func()
 	for i := 0; i < 10; i++ {
-		res = sp.AcquireSlot()
+		res, release = sp.AcquireSlot()
 		assert.True(t, res)
 	}
 
-	sp.Release()
-	res = sp.AcquireSlot()
+	release()
+	res, _ = sp.AcquireSlot()
 
 	assert.True(t, res)
 }
@@ -38,7 +39,7 @@ func TestMut_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T)
 
 	results := make([]bool, 11)
 	for i := 0; i < 11; i++ {
-		results[i] = sp.AcquireSlot()
+		results[i], _ = sp.AcquireSlot()
 	}
 
 	for i := 0; i < 10; i++ {

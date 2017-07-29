@@ -18,15 +18,19 @@ func (sp *spSingleChannel) OpenSlots() int {
 	return 0
 }
 
-func (sp *spSingleChannel) Release() {
+func (sp *spSingleChannel) release() {
 	sp.slotChan <- element
 }
 
-func (sp *spSingleChannel) AcquireSlot() bool {
+func (sp *spSingleChannel) AcquireSlot() (bool, func()) {
 	select {
 	case <-sp.slotChan:
-		return true
+		f := sp.release
+		return true, func() {
+			f()
+			f = emptyFunction
+		}
 	default:
-		return false
+		return false, emptyFunction
 	}
 }

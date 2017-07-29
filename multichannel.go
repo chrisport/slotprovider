@@ -39,15 +39,19 @@ func (sp *spChannel) start() {
 	}
 }
 
-func (sp *spChannel) Release() {
+func (sp *spChannel) release() {
 	sp.notifyChan <- true
 }
 
-func (sp *spChannel) AcquireSlot() bool {
+func (sp *spChannel) AcquireSlot() (hasSlot bool, release func()) {
 	select {
 	case <-sp.slotChan:
-		return true
+		f := sp.release
+		return true, func() {
+			f()
+			f = emptyFunction
+		}
 	default:
-		return false
+		return false, emptyFunction
 	}
 }

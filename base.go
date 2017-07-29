@@ -1,8 +1,9 @@
 package slotprovider
 
+var emptyFunction = func() {}
+
 type SlotProvider interface {
-	AcquireSlot() bool
-	Release()
+	AcquireSlot() (hasSlot bool, release func())
 	OpenSlots() int
 }
 
