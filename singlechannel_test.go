@@ -3,11 +3,11 @@ package slotprovider_test
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"com/github/chrisport/slotprovider"
+	"github.com/chrisport/slotprovider"
 )
 
-func TestMut_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
-	sp = slotprovider.NewWithMutex(nrOfSlots)
+func TestSingleChan_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
+	sp = slotprovider.NewWithSingleChannel(nrOfSlots)
 
 	results := make([]bool, 11)
 	for i := 0; i < 10; i++ {
@@ -19,8 +19,8 @@ func TestMut_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
 	}
 }
 
-func TestMut_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
-	sp = slotprovider.NewWithMutex(nrOfSlots)
+func TestSingleChan_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
+	sp = slotprovider.NewWithSingleChannel(nrOfSlots)
 	var res bool
 	for i := 0; i < 10; i++ {
 		res = sp.AcquireSlot()
@@ -33,8 +33,8 @@ func TestMut_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t
 	assert.True(t, res)
 }
 
-func TestMut_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
-	sp = slotprovider.NewWithMutex(nrOfSlots)
+func TestSingleChan_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
+	sp = slotprovider.NewWithSingleChannel(nrOfSlots)
 
 	results := make([]bool, 11)
 	for i := 0; i < 11; i++ {

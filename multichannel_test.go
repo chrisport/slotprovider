@@ -4,7 +4,7 @@ import (
 	"golang.org/x/net/context"
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"com/github/chrisport/slotprovider"
+	"github.com/chrisport/slotprovider"
 )
 
 const nrOfSlots = 10
@@ -13,7 +13,7 @@ var sp slotprovider.SlotProvider
 
 func setupProvider() (cancelFunc func()) {
 	ctx, cancel := context.WithCancel(context.Background())
-	sp = slotprovider.NewWithChannel(nrOfSlots, ctx)
+	sp = slotprovider.NewWithMultiChannel(nrOfSlots, ctx)
 	return cancel
 }
 
@@ -56,32 +56,4 @@ func Test_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
 		assert.True(t, results[i])
 	}
 	assert.False(t, results[10])
-}
-
-func Benchmark_slotProvider(b *testing.B) {
-	defer setupProvider()()
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		hasSlot := sp.AcquireSlot()
-		if hasSlot != true {
-			panic("was not true")
-		}
-		sp.Release()
-	}
-	global = sp.OpenSlots()
-}
-
-var global int
-
-func Benchmark_Mutex(b *testing.B) {
-	sp := slotprovider.NewWithMutex(nrOfSlots)
-	for i := 0; i < b.N; i++ {
-		hasSlot := sp.AcquireSlot()
-		if hasSlot != true {
-			panic("was not true")
-		}
-		sp.Release()
-	}
-	global = sp.OpenSlots()
 }
