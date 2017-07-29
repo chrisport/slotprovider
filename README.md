@@ -1,6 +1,5 @@
 # slotprovider
 
-## SlotProvider
 Experimental package.
 Manages a number of free slots which can be acquired and released concurrently.
 There are 3 implementations
@@ -16,7 +15,7 @@ Benchmark_MultiChan-4            1000000              1364 ns/op
 ```
 
 ## Usage
-Usage of channel based implementation
+
 ```
 nrOfSlots := 2
 var sp slotprovider.SlotProvider
@@ -26,11 +25,16 @@ sp = slotprovider.NewWithSingleChannel(nrOfSlots)
 sp = slotprovider.NewWithMultiChannel(nrOfSlots, context.Background())
 
 
-hasSlot := sp.AcquireSlot() // hasSlot2 = true
-hasSlot2 := sp.AcquireSlot() // hasSlot2 = true
-hasSlot3 := sp.AcquireSlot() // hasSlot3 = false
+hasSlot,_ := sp.AcquireSlot() // hasSlot2 = true
+hasSlot2,_ := sp.AcquireSlot() // hasSlot2 = true
+hasSlot3, release := sp.AcquireSlot() // hasSlot3 = false
 
-sp.release()
+release()
 
 hasSlot4 := sp.AcquireSlot() // hasSlot4 = true
 ```
+Note:
+- hasSlot: indicate whether or not the requester has acquired a slot. If false, there was no free slot left.
+- release: function to release the acquired slot
+ - release can be called safely, even if no slot has been acquired
+ - release can be called multiple times, consequent calls will be ignored silently

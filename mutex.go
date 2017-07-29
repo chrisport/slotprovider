@@ -4,29 +4,29 @@ import (
 	"sync"
 )
 
-func NewWithMutex(nrOfSlots int) *SpMutex {
-	return &SpMutex{Mut: sync.Mutex{}, openSlots: nrOfSlots}
+func NewWithMutex(nrOfSlots int) *spMutex {
+	return &spMutex{mut: sync.Mutex{}, openSlots: nrOfSlots}
 }
 
-type SpMutex struct {
+type spMutex struct {
 	openSlots int
-	Mut       sync.Mutex
+	mut       sync.Mutex
 }
 
-func (sp *SpMutex) OpenSlots() int {
+func (sp *spMutex) OpenSlots() int {
 	return sp.openSlots
 }
 
-func (sp *SpMutex) release() {
-	sp.Mut.Lock()
+func (sp *spMutex) release() {
+	sp.mut.Lock()
 	sp.openSlots++
-	sp.Mut.Unlock()
+	sp.mut.Unlock()
 }
 
-func (sp *SpMutex) AcquireSlot() (bool, func()) {
+func (sp *spMutex) AcquireSlot() (bool, func()) {
 	res := false
 	fun := emptyFunction
-	sp.Mut.Lock()
+	sp.mut.Lock()
 	if sp.openSlots > 0 {
 		sp.openSlots--
 		res = true
@@ -36,6 +36,6 @@ func (sp *SpMutex) AcquireSlot() (bool, func()) {
 			f = emptyFunction
 		}
 	}
-	sp.Mut.Unlock()
+	sp.mut.Unlock()
 	return res, fun
 }
