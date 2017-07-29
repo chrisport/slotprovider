@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type SlotProvider interface{
+type SlotProvider interface {
 	Start()
 	RequestSlot() (bool, func())
 }
@@ -26,7 +26,9 @@ func NewSlotProvider(nrOfSlots int, ctx context.Context) SlotProvider {
 	for ; openSlots > 0; openSlots-- {
 		slotChan <- true
 	}
-	return &slotProvider{openSlots: nrOfSlots, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
+	sp := &slotProvider{openSlots: nrOfSlots, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
+	go sp.Start()
+	return sp
 }
 
 func (sp *slotProvider) Start() {

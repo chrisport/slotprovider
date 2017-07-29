@@ -13,7 +13,6 @@ var sp slotprovider.SlotProvider
 func setupProvider() (cancelFunc func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	sp = slotprovider.NewSlotProvider(nrOfSlots,ctx)
-	go sp.Start()
 	return cancel
 }
 
