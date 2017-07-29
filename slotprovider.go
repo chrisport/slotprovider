@@ -9,7 +9,7 @@ import (
 
 type SlotProvider interface {
 	Start()
-	RequestSlot() (bool, func())
+	AcquireSlot() (bool, func())
 }
 
 type slotProvider struct {
@@ -48,7 +48,7 @@ func (sp *slotProvider) Start() {
 	}
 }
 
-func (sp *slotProvider) RequestSlot() (bool, func()) {
+func (sp *slotProvider) AcquireSlot() (bool, func()) {
 	select {
 	case <-sp.slotChan:
 		once := sync.Once{}

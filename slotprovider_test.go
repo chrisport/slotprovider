@@ -16,12 +16,12 @@ func setupProvider() (cancelFunc func()) {
 	return cancel
 }
 
-func Test_givenNoSlotOccupied_whenRequestSlot_thenReturnTrue(t *testing.T) {
+func Test_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
 	defer setupProvider()()
 
 	results := make([]bool, 11)
 	for i := 0; i < 10; i++ {
-		results[i], _ = sp.RequestSlot()
+		results[i], _ = sp.AcquireSlot()
 	}
 
 	for i := 0; i < 10; i++ {
@@ -29,27 +29,27 @@ func Test_givenNoSlotOccupied_whenRequestSlot_thenReturnTrue(t *testing.T) {
 	}
 }
 
-func Test_givenAllSlotOccupied_whenOneReleasedAndRequestSlot_thenReturnTrue(t *testing.T) {
+func Test_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
 	defer setupProvider()()
 	var release func()
 	var res bool
 	for i := 0; i < 10; i++ {
-		res, release = sp.RequestSlot()
+		res, release = sp.AcquireSlot()
 		assert.True(t,res)
 	}
 
 	release()
-	res, _ = sp.RequestSlot()
+	res, _ = sp.AcquireSlot()
 
 	assert.True(t, res)
 }
 
-func Test_givenAllSlotsOccupied_whenRequestSlot_thenReturnFalse(t *testing.T) {
+func Test_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
 	defer setupProvider()()
 
 	results := make([]bool, 11)
 	for i := 0; i < 11; i++ {
-		results[i], _ = sp.RequestSlot()
+		results[i], _ = sp.AcquireSlot()
 	}
 
 	for i := 0; i < 10; i++ {
