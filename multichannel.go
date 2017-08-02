@@ -18,7 +18,7 @@ func NewWithMultiChannel(nrOfSlots int, ctx context.Context) SlotProvider {
 	for ; openSlots > 0; openSlots-- {
 		slotChan <- true
 	}
-	sp := &spChannel{openSlots: nrOfSlots, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
+	sp := &spChannel{openSlots: 0, slotChan: slotChan, notifyChan: notifyChan, ctx: ctx}
 	go sp.start()
 	return sp
 }
@@ -29,13 +29,12 @@ func (sp *spChannel) OpenSlots() int {
 
 func (sp *spChannel) start() {
 	for {
-		select {
-		case sp.slotChan <- true:
-		case <-sp.ctx.Done():
-			return
-		case <-sp.notifyChan:
-			sp.openSlots++
+		for ; sp.openSlots > 0; sp.openSlots-- {
+			sp.slotChan <- true
 		}
+
+		<-sp.notifyChan
+		sp.openSlots++
 	}
 }
 
