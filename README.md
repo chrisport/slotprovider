@@ -46,8 +46,9 @@ hasSlot4 := sp.AcquireSlot() // hasSlot4 = true
 Note:
 - hasSlot: indicate whether or not the requester has acquired a slot. If false, there was no free slot left.
 - release: function to release the acquired slot
- - release can be called safely, even if no slot has been acquired
- - release can be called multiple times, consequent calls will be ignored silently
+  - a release function can be called safely, even if no slot has been acquired
+  - a release function can be called multiple times, consequent calls will be ignored silently
+  - a release function must not be called multiple times concurrently, this might create new slots.
 
 # Contribution
 
