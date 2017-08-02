@@ -22,7 +22,8 @@ func (sp *spAtomicInt) release() {
 }
 
 func (sp *spAtomicInt) AcquireSlot() (hasSlot bool, release func()) {
-	if atomic.LoadInt64(&sp.openSlots) < 0 {
+	//precheck to prevent deadlock
+	if atomic.LoadInt64(&sp.openSlots) <= 0 {
 		return false, emptyFunction
 	}
 	newVal := atomic.AddInt64(&sp.openSlots, -1)
