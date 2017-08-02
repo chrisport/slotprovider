@@ -1,9 +1,9 @@
 # slotprovider
 
 Experimental package.
-Manages a number of free slots which can be acquired and released concurrently.
-**no waiting for free slot:** If there is no free slot, the acquire method returns immediately with false.
-There are 4 implementations
+Manages a number of free slots which can be acquired and released concurrently.   
+**No blocking:** If there is no free slot, the Acquire method returns immediately with false.   
+There are 4 implementations .  
  - Using int64 and atomic package
  - Using sync.Mutex
  - Using 1 buffered channel
