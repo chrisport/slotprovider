@@ -30,11 +30,7 @@ func (sp *spMutex) AcquireSlot() (bool, func()) {
 	if sp.openSlots > 0 {
 		sp.openSlots--
 		res = true
-		f := sp.release
-		fun = func() {
-			f()
-			f = emptyFunction
-		}
+		fun = sp.release
 	}
 	sp.mut.Unlock()
 	return res, fun

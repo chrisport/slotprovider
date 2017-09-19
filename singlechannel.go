@@ -25,11 +25,7 @@ func (sp *spSingleChannel) release() {
 func (sp *spSingleChannel) AcquireSlot() (bool, func()) {
 	select {
 	case <-sp.slotChan:
-		f := sp.release
-		return true, func() {
-			f()
-			f = emptyFunction
-		}
+		return true, sp.release
 	default:
 		return false, emptyFunction
 	}

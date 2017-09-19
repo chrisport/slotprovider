@@ -3,28 +3,37 @@ package slotprovider
 import (
 	"sync/atomic"
 )
+const minusOne uint64 = ^uint64(0)
 
-type spAtomicInt struct {
-	openSlots int64
+type spAtomicUInt64 struct {
+	openSlots uint64
 }
 
-func NewWithAtomicInt(nrOfSlots int) SlotProvider {
-	sp := &spAtomicInt{openSlots: int64(nrOfSlots)}
+func NewWithAtomicUInt64(nrOfSlots int) SlotProvider {
+	sp := &spAtomicUInt64{
+		openSlots: uint64(nrOfSlots),
+	}
 	return sp
 }
 
-func (sp *spAtomicInt) OpenSlots() int {
-	return int(atomic.LoadInt64(&sp.openSlots))
+func (sp *spAtomicUInt64) OpenSlots() int {
+	return int(atomic.LoadUint64(&sp.openSlots))
 }
 
-func (sp *spAtomicInt) release() {
-	atomic.AddInt64(&sp.openSlots, 1)
+func (sp *spAtomicUInt64) release() {
+	atomic.AddUint64(&sp.openSlots, 1)
 }
 
-func (sp *spAtomicInt) AcquireSlot() (hasSlot bool, release func()) {
-	if atomic.AddInt64(&sp.openSlots, -1) < 0 {
-		atomic.AddInt64(&sp.openSlots, 1)
+func (sp *spAtomicUInt64) AcquireSlot() (hasSlot bool, release func()) {
+	//precheck to prevent deadlock
+	if atomic.LoadUint64(&sp.openSlots) <= 0 {
 		return false, emptyFunction
 	}
-	return true, sp.release
+	newVal := atomic.AddUint64(&sp.openSlots, minusOne)
+	if newVal < 0 {
+		sp.release()
+		return false, emptyFunction
+	} else {
+		return true, sp.release
+	}
 }

@@ -2,13 +2,13 @@ package slotprovider_test
 
 import (
 	"testing"
-	"github.com/stretchr/testify/assert"
 	"github.com/chrisport/slotprovider"
 	"time"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestAtInt_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
-	sp := slotprovider.NewWithAtomicInt(nrOfSlots)
+func TestAtUInt64_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
+	sp := slotprovider.NewWithAtomicUInt64(nrOfSlots)
 
 	results := make([]bool, nrOfSlots+1)
 	for i := 0; i < nrOfSlots; i++ {
@@ -20,8 +20,8 @@ func TestAtInt_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) 
 	}
 }
 
-func TestAtInt_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
-	sp := slotprovider.NewWithAtomicInt(nrOfSlots)
+func TestAtUInt6464_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
+	sp := slotprovider.NewWithAtomicUInt64(nrOfSlots)
 	var res bool
 	var release func()
 	for i := 0; i < nrOfSlots; i++ {
@@ -36,8 +36,8 @@ func TestAtInt_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue
 	assert.True(t, res)
 }
 
-func TestAtInt_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
-	sp := slotprovider.NewWithAtomicInt(nrOfSlots)
+func TestAtUInt64_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
+	sp := slotprovider.NewWithAtomicUInt64(nrOfSlots)
 
 	results := make([]bool, nrOfSlots+1)
 	for i := 0; i < nrOfSlots+1; i++ {
@@ -50,22 +50,22 @@ func TestAtInt_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.
 }
 
 
-func Benchmark_AtomicInt(b *testing.B) {
-	sp := slotprovider.NewWithAtomicInt(nrOfSlots)
+func Benchmark_AtomicUInt64(b *testing.B) {
+	sp := slotprovider.NewWithAtomicUInt64(nrOfSlots)
 
 	benchmark(b, sp)
 }
 
 
-func BenchmarkVerify_AtomicInt_parallel(b *testing.B) {
-	sp := slotprovider.NewWithAtomicInt(nrOfSlots)
+func BenchmarkVerify_AtomicUInt64_parallel(b *testing.B) {
+	sp := slotprovider.NewWithAtomicUInt64(nrOfSlots)
 
 	verify_parallel(b, sp)
 }
 
 
-func Benchmark_AtomicInt_parallel(b *testing.B) {
-	sp := slotprovider.NewWithAtomicInt(nrOfSlots)
+func Benchmark_AtomicUInt64_parallel(b *testing.B) {
+	sp := slotprovider.NewWithAtomicUInt64(nrOfSlots)
 
 	benchmark_parallel(b, sp)
 }

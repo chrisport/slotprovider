@@ -9,7 +9,7 @@ import (
 
 
 func TestAtPaddedInt64_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *testing.T) {
-	sp := slotprovider.NewWithAtomicPaddedLong(nrOfSlots)
+	sp := slotprovider.NewWithAtomicUInt64Padded(nrOfSlots)
 
 	results := make([]bool, nrOfSlots+1)
 	for i := 0; i < nrOfSlots; i++ {
@@ -21,8 +21,8 @@ func TestAtPaddedInt64_givenNoSlotOccupied_whenAcquireSlot_thenReturnTrue(t *tes
 	}
 }
 
-func TestAtPaddedInt64_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
-	sp := slotprovider.NewWithAtomicPaddedLong(nrOfSlots)
+func TestAtPaddedUInt64_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenReturnTrue(t *testing.T) {
+	sp := slotprovider.NewWithAtomicUInt64Padded(nrOfSlots)
 	var res bool
 	var release func()
 	for i := 0; i < nrOfSlots; i++ {
@@ -37,8 +37,8 @@ func TestAtPaddedInt64_givenAllSlotOccupied_whenOneReleasedAndAcquireSlot_thenRe
 	assert.True(t, res)
 }
 
-func TestAtPaddedInt64_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
-	sp := slotprovider.NewWithAtomicPaddedLong(nrOfSlots)
+func TestAtPaddedUInt64_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *testing.T) {
+	sp := slotprovider.NewWithAtomicUInt64Padded(nrOfSlots)
 
 	results := make([]bool, nrOfSlots+1)
 	for i := 0; i < nrOfSlots+1; i++ {
@@ -51,17 +51,17 @@ func TestAtPaddedInt64_givenAllSlotsOccupied_whenAcquireSlot_thenReturnFalse(t *
 }
 
 
-func Benchmark_AtomicPaddedLong(b *testing.B) {
-	sp := slotprovider.NewWithAtomicPaddedLong(nrOfSlots)
+func Benchmark_AtomicUInt64Padded(b *testing.B) {
+	sp := slotprovider.NewWithAtomicUInt64Padded(nrOfSlots)
 	benchmark(b, sp)
 }
 
-func BenchmarkVerify_AtomicPaddedLong_parallel(b *testing.B) {
-	sp := slotprovider.NewWithAtomicPaddedLong(nrOfSlots)
+func BenchmarkVerify_AtomicUInt64Padded_parallel(b *testing.B) {
+	sp := slotprovider.NewWithAtomicUInt64Padded(nrOfSlots)
 	verify_parallel(b, sp)
 }
 
-func Benchmark_AtomicPaddedLong_parallel(b *testing.B) {
-	sp := slotprovider.NewWithAtomicPaddedLong(nrOfSlots)
+func Benchmark_AtomicUInt64Padded_parallel(b *testing.B) {
+	sp := slotprovider.NewWithAtomicUInt64Padded(nrOfSlots)
 	benchmark_parallel(b, sp)
 }

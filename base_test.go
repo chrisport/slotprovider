@@ -9,6 +9,8 @@ import (
 var global int
 var globalMux = sync.Mutex{}
 var globalCounter = 0
+const nrOfSlots = 137
+var sp slotprovider.SlotProvider
 
 func benchmark(b *testing.B, sp slotprovider.SlotProvider) {
 	var release func()
