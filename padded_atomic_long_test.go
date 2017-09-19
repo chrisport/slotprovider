@@ -2,7 +2,7 @@ package slotprovider_test
 
 import (
 	"testing"
-	"github.com/johannesh/slotprovider"
+	"github.com/chrisport/slotprovider"
 )
 
 func Benchmark_AtomicPaddedLong(b *testing.B) {
